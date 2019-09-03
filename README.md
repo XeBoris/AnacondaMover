@@ -1,11 +1,12 @@
 # AnacondaMover
 A simple Python script to move your Anaconda base directory after installation with all created environements.
 
-Sometimes you want to move your base directory later after the installation of Anaconda. This small scipt helps you to replace the prefix choice which was done at the very beginning of the environments.
+Sometimes you want to move your base directory later after the installation of Anaconda. This small script helps you to replace the prefix choice which was done at the very beginning of the environments.
 
+Hints:
   * Python 3!
   * No guarantee for success!
-  * Does not delete your original Anaconda directory!
+  * Does not delete your original Anaconda directory! Do it manually afterwards
 
 # How to run it:
 
