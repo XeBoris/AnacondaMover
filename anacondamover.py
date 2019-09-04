@@ -82,14 +82,23 @@ def set_function(path, old_path=None, new_path=None):
 def copyconda(from_path, to_path):
     try:
         print()
+        if os.path.exists(to_path):
+            print("Destination {0} exists already!".format(to_path))
+            rm_os = input("Remove and copy again? (y/n) ")
+            if rm_os == 'y':
+                shutil.rmtree(to_path)
+            else:
+                print("Remove {0} manually and start again".format(to_path))
+                return 1
+        print()         
         print("Start to copy Anaconda directory")
         shutil.copytree(from_path, to_path)
         print("Finished")
         print()
     except:
         print("Something wrong with copying the directory")
-                    
-
+        return 1
+    return 0
     
 def main():
     parser = argparse.ArgumentParser(description="Hello; I move your Anaconda environment")
@@ -98,8 +107,12 @@ def main():
                         help="Specify your input directory")
     parser.add_argument('--output', dest='output_', type=str, default=None,
                         help="Specify your output directory")
-    parser.add_argument('--skip-copy', dest='skip_copy', action='store_true')
-    
+    parser.add_argument('--skip-copy', dest='skip_copy', action='store_true',
+                        help="Select --skip-copy if you have copied your "\
+                             "Anaconda environment manually beforehand")
+    parser.add_argument('--skip-moving', dest='skip_moving', action='store_true',
+                        help="Select --skip-moving if you do not want "\
+                            "alter your <i>new</i> Anaconda environment")
     
     args = parser.parse_args()
     anaconda_old = args.input_
@@ -108,8 +121,12 @@ def main():
     anaconda_old_abs = os.path.abspath(anaconda_old)
     anaconda_new_abs = os.path.abspath(anaconda_new)
     
-    anaconda_old = anaconda_old+"/"
-    anaconda_in = anaconda_new+"/"
+    if anaconda_old.endswith('/') == False:
+        anaconda_old = anaconda_old+"/"
+    
+    if anaconda_new.endswith('/') == False:
+        anaconda_new = anaconda_new+"/"
+        
     
     print()
     print("Hello; I move your Anaconda environment")
@@ -121,36 +138,47 @@ def main():
     print("----")
     print(" Search and replace patterns:")
     print("Search for: {0}".format(anaconda_old))
-    print("Replace by: {0}".format(anaconda_in))
+    print("Replace by: {0}".format(anaconda_new))
     
     #Decide if the Anaconda folder is copied by this script or if
     #you have done it manually.
     if args.skip_copy == False:
-        copyconda(anaconda_old_abs, anaconda_new_abs)
+        copy_success = copyconda(anaconda_old_abs, anaconda_new_abs)
+        if copy_success == 1:
+            print("Exit here...")
+            exit()
     else:
         print("Skip to copy the environment")
     
+    
+    if args.skip_moving == True:
+        print("Re-prefix operation is skipped for {0} path".format(anaconda_new))
+        exit()
+        
     print("Re-prefix of the copied Anaconda environment")
     
     #get folders
-    if os.path.isdir(anaconda_in):
-        main_dir_overview = get_folders(anaconda_in)
+    if os.path.isdir(anaconda_new):
+        main_dir_overview = get_folders(anaconda_new)
         if 'envs' in main_dir_overview:
-            additional_environments = get_folders(os.path.join(anaconda_in, "envs"))
+            additional_environments = get_folders(os.path.join(anaconda_new, "envs"))
             
     else:
-        print("Something wrong with ", anaconda_in, " exit here")
+        print("Something wrong with ", anaconda_new, " exit here")
         exit()
         
+    print()
+    print("Start to alter the copied Anaconda environment")
     #main path:
-    set_function(os.path.join(anaconda_in, "bin"), anaconda_old, anaconda_in)
+    set_function(os.path.join(anaconda_new, "bin"), anaconda_old, anaconda_new)
     
     #go over environments:
     for i_env in additional_environments:
-        p_full = os.path.join(anaconda_in, "envs", i_env, "bin")
-        set_function(p_full, anaconda_old, anaconda_in)
+        p_full = os.path.join(anaconda_new, "envs", i_env, "bin")
+        set_function(p_full, anaconda_old, anaconda_new)
     
     print("done")
+    print("Adjust your Anaconda path and source the new loction")
     exit(0)
     
 if __name__ == '__main__':
