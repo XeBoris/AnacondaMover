@@ -19,3 +19,7 @@ If you have copied the Anaconda directory already manually you can run:
 ```
 python anacondamover.py --input /path/to/your/input/anaconda3 --output /path/to/new/anaconda3/ --skip-copy
 ```
+# Known issues:
+As expected, it runs not perfectly :) - Here is a list of known issues:
+
+* If you run e.g. ROOT (CERN data analysis framework) or anything related to the downloaded gcc in Anaconda it might crash. Possible solution is to install gcc again in the environments ('conda install gcc')
